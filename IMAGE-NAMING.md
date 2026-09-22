@@ -19,15 +19,18 @@ the two agent images share a version.
 
 At the naming change, the latest published versions were:
 
-| Release line | Last version under the old name | Next patch version |
-|---|---|---|
-| Backend | `1.1.1` | `1.1.2` |
-| Frontend | `1.1.0` | `1.1.1` |
-| Both agents | `1.1.3` | `1.1.4` |
+| Release line | Last version under the old name |
+|---|---|
+| Backend | `1.1.1` |
+| Frontend | `1.1.0` |
+| Both agents | `1.1.3` |
 
 These are the versions verified on September 22, 2026, not permanent next-version settings.
 Before releasing, fetch the repo's tags and check both the old and new packages. Continue
-from the latest version in that release line, using a minor or major bump when appropriate.
+from the latest version in that release line and choose the bump using the
+[release policy](RELEASE-POLICY.md), rather than automatically adding a patch.
+The backend's published `1.1.1` included new APIs; preserve that tag and establish at least
+the `1.2.0` line on its next release, accounting for any newer releases or breaking changes.
 Do not reuse an old version just because the new package is empty. The `v1.1.0` checkpoint
 and all other published tags remain immutable.
 
