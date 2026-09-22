@@ -65,8 +65,10 @@ procedures. It depends on one server, its power and its internet connection.
 
 See the [GitOps home profile](https://github.com/Steve-droid/driftplain-gitops/tree/main/argocd/home-server)
 and [operations guide](https://github.com/Steve-droid/driftplain-infra/blob/main/home-server/HM5-OPERATIONS.md)
-for the configuration and operating details. Image and resource names containing `modelmatch`
-remain from the project's original name.
+for the configuration and operating details. New images use `driftplain-*` names; existing
+`modelmatch-*` packages stay available. Version numbers continue across the rename. See the
+[image naming policy](IMAGE-NAMING.md) for package names and release steps.
+Kubernetes resources, database names and CI credential identifiers keep their existing names.
 
 ## Development
 
