@@ -1,87 +1,84 @@
 # Driftplain
 
-**AI code review in your CI, using your own model credentials.**
+AI code review in your CI, using your own model credentials.
 
-[Open the application](https://driftplain.dev) · [Stable release](https://github.com/Steve-droid/driftplain/releases/tag/v1.1.0) · [Frontend](https://github.com/Steve-droid/driftplain-frontend) · [Backend & agents](https://github.com/Steve-droid/driftplain-backend) · [Infrastructure](https://github.com/Steve-droid/driftplain-infra) · [GitOps](https://github.com/Steve-droid/driftplain-gitops)
+[Open the app](https://driftplain.dev) · [Frontend](https://github.com/Steve-droid/driftplain-frontend) · [Backend and agents](https://github.com/Steve-droid/driftplain-backend) · [Infrastructure](https://github.com/Steve-droid/driftplain-infra) · [GitOps](https://github.com/Steve-droid/driftplain-gitops)
 
-Driftplain connects a model catalog to containerized AI agents running inside a developer's
-Jenkins pipeline. Configure an agent in the web app, add the generated pipeline stage, and
-inspect its findings and recorded usage in the dashboard.
+Driftplain connects a model catalog to AI agents running in your Jenkins pipeline.
+Configure an agent in the web app, add the generated pipeline stage, and view its findings
+and usage in the dashboard.
 
 Built and maintained by [Steve Levit](https://github.com/Steve-droid) as a DevOps portfolio
-project. This repository is the project overview; implementation lives in the four repositories below.
+project. This repo is the starting point; the code lives in the four repos below.
 
 ## What you can do today
 
-| Task | How it runs | CI result |
+| Task | How it runs | Default CI gate |
 |---|---|---|
-| PR code review | One model call over the pull-request diff and your review preferences | Findings; high or critical findings fail the review stage |
-| Security analysis | An OpenCode agent inspects a read-only repository checkout | Vulnerability findings; critical findings fail the security stage |
+| PR code review | One model call with the pull-request diff and your review preferences. | High or critical findings fail the stage. |
+| Security analysis | An OpenCode agent inspects a read-only repository checkout over multiple steps. | Critical findings fail the stage. |
 
-The agents run on **your own API key** in your CI environment. Credentials remain in Jenkins;
-the hosted application receives findings and usage. Agents do not edit or push your code.
-Password login and Google sign-in are available, and example projects demonstrate the dashboard.
+The agents use your model credentials in your CI environment. Credentials stay in Jenkins;
+the hosted app receives findings and usage. Agents do not edit or push your code.
+You can sign in with a password or Google, and example projects let you explore the dashboard.
 
 ## How it fits together
 
-1. **Configure:** select a task and model in the React app. The FastAPI backend stores the
-   project and generates the Jenkins stage with a project-scoped CI token.
-2. **Run:** Jenkins starts the appropriate agent container with your provider credentials
-   and the diff or checkout. The agent applies its CI gate and submits findings and usage.
-3. **Inspect:** view runs, token usage, cost calculations and feedback on findings in the dashboard.
+1. Choose a task and model in the React app. The FastAPI backend saves the project and
+   generates a Jenkins stage with a project CI token.
+2. Jenkins starts an agent container with your provider credentials and the diff or checkout.
+   The agent reports findings, sets the stage's pass or fail result, and submits usage to the API.
+3. Open the dashboard to inspect runs, token usage, cost calculations and feedback on findings.
 
-The current catalog uses task-specific benchmark snapshots. Current cost comparisons reprice
-the selected model's token usage at a baseline model's rates; they are **not measured savings
-from running two models on the same task**. The hosted chat assistant is currently offline.
+The current model ranking combines task-specific benchmark scores and token prices.
+Cost comparisons price a run's token usage at both the selected model's rates and a baseline
+model's rates. The baseline is not run, so the difference is an estimate rather than measured
+savings. The hosted chat assistant is currently offline.
 
 ## Repositories
 
-| Repository | What to explore |
+Start with the frontend for the user flow, then the backend for how it works. The infrastructure
+and GitOps repos explain how the application is deployed and operated.
+
+| Repository | What it contains |
 |---|---|
-| [driftplain-frontend](https://github.com/Steve-droid/driftplain-frontend) | React 19, TypeScript, onboarding, dashboards, authentication and browser tests |
-| [driftplain-backend](https://github.com/Steve-droid/driftplain-backend) | FastAPI, catalog ingestion, PostgreSQL persistence, authentication, usage accounting and both CI-agent images |
-| [driftplain-infra](https://github.com/Steve-droid/driftplain-infra) | Terraform, the original AWS platform, home-server provisioning, identity, backups and recovery runbooks |
-| [driftplain-gitops](https://github.com/Steve-droid/driftplain-gitops) | Helm charts, ArgoCD applications, image digest pins, database migration jobs and deployment contract tests |
+| [driftplain-frontend](https://github.com/Steve-droid/driftplain-frontend) | React and TypeScript web app: agent setup, dashboards, authentication and browser tests. |
+| [driftplain-backend](https://github.com/Steve-droid/driftplain-backend) | FastAPI service: model catalog, projects, PostgreSQL data, usage accounting and both CI agents. |
+| [driftplain-infra](https://github.com/Steve-droid/driftplain-infra) | Terraform for external services, home-server setup, identity, backups and recovery tools. |
+| [driftplain-gitops](https://github.com/Steve-droid/driftplain-gitops) | Helm charts and ArgoCD applications that deploy the app and supporting services to Kubernetes. |
 
-For local setup and tests, follow the relevant repository's README. The backend's
-[agent guide](https://github.com/Steve-droid/driftplain-backend/tree/main/agent) explains CI execution.
+Each repo has local setup instructions and a guide to its main components.
 
-## Deployment and engineering
+## Deployment
 
-The application runs on a maintained **single-node K3s cluster on a home Ubuntu server**,
-exposed through Cloudflare Tunnel. PostgreSQL is managed by CloudNativePG. The original AWS
-EKS deployment was retired in September 2026; its Terraform remains available as project history.
+The app runs on a single-node K3s cluster on an Ubuntu home server, exposed through
+Cloudflare Tunnel. CloudNativePG manages PostgreSQL inside the cluster. The application
+moved from AWS EKS in September 2026, and the original Terraform remains available for reference.
+AWS still holds storage, identity and DNS resources.
 
-- **Image delivery:** GitHub Actions publishes versioned backend/frontend images to GHCR.
-- **GitOps:** reviewed image digest changes flow through Helm and ArgoCD; publishing an image
-  does not automatically change the running application.
-- **Database changes:** explicit migration jobs run separately from application startup.
-- **Bounded AI execution:** CI agents enforce resource and token limits; tests use fake model
-  clients and fixtures instead of paid API calls.
-- **Operations:** health checks, monitoring, encrypted backups and documented restore procedures
-  support the maintained deployment.
+GitHub Actions publishes versioned images to GHCR. A separate PR in the GitOps repo pins an
+image digest, then ArgoCD deploys it. Publishing an image does not change the running app.
+Database migrations run separately from application startup.
 
-Start with the [GitOps home profile](https://github.com/Steve-droid/driftplain-gitops/tree/main/argocd/home-server)
+The deployment includes health checks, monitoring, encrypted backups and tested restore
+procedures. It depends on one server, its power and its internet connection.
+
+See the [GitOps home profile](https://github.com/Steve-droid/driftplain-gitops/tree/main/argocd/home-server)
 and [operations guide](https://github.com/Steve-droid/driftplain-infra/blob/main/home-server/HM5-OPERATIONS.md)
-for a deployment walkthrough.
+for the configuration and operating details. Image and resource names containing `modelmatch`
+remain from the project's original name.
 
-## Stable interview checkpoint
+## Development
 
-**`v1.1.0`** identifies the September 22, 2026 pre-refactor checkpoint across the four component
-repositories. Each release records its exact source commit:
+Tests use fake model responses and fixtures without paid API calls. CI agents enforce token
+limits, and the security agent also limits steps and runtime.
 
-- [Frontend v1.1.0](https://github.com/Steve-droid/driftplain-frontend/releases/tag/v1.1.0)
-- [Backend and agents v1.1.0](https://github.com/Steve-droid/driftplain-backend/releases/tag/v1.1.0)
-- [Infrastructure v1.1.0](https://github.com/Steve-droid/driftplain-infra/releases/tag/v1.1.0)
-- [GitOps v1.1.0](https://github.com/Steve-droid/driftplain-gitops/releases/tag/v1.1.0)
+Work is underway to add public benchmark browsing, separate it from CI setup, and replace
+the cost comparison with selected-model usage and cost. The backend already includes read-only
+catalog APIs; the browsing UI is still in development. Test generation, CI failure diagnosis
+and custom tasks are planned.
 
-Use these tags for a stable code walkthrough while development continues. For runtime recovery,
-the GitOps checkpoint retains the deployed image digests; use the
-[recovery runbook](https://github.com/Steve-droid/driftplain-infra/blob/v1.1.0/home-server/RECOVERY.md)
-and check database compatibility before restoring a deployment.
+For a fixed code walkthrough, the September 22, 2026 `v1.1.0` releases preserve the application
+before these changes:
 
-## Planned next
-
-The next product iteration separates public benchmark exploration from CI setup, replaces
-hypothetical savings with selected-model usage and cost, and adds test generation, CI failure
-diagnosis and custom tasks. These features are planned; they are not part of this stable release.
+[Overview](https://github.com/Steve-droid/driftplain/releases/tag/v1.1.0) · [Frontend](https://github.com/Steve-droid/driftplain-frontend/releases/tag/v1.1.0) · [Backend](https://github.com/Steve-droid/driftplain-backend/releases/tag/v1.1.0) · [Infrastructure](https://github.com/Steve-droid/driftplain-infra/releases/tag/v1.1.0) · [GitOps](https://github.com/Steve-droid/driftplain-gitops/releases/tag/v1.1.0)
