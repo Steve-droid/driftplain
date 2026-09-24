@@ -1,39 +1,51 @@
 # Driftplain
 
-AI code review in your CI, using your own model credentials.
+Compare benchmark evidence. Choose an eligible model for CI. Track usage and results.
 
 [Open the app](https://driftplain.dev) · [Frontend](https://github.com/Steve-droid/driftplain-frontend) · [Backend and agents](https://github.com/Steve-droid/driftplain-backend) · [Infrastructure](https://github.com/Steve-droid/driftplain-infra) · [GitOps](https://github.com/Steve-droid/driftplain-gitops)
 
-Driftplain connects a model catalog to AI agents running in your Jenkins pipeline.
-Configure an agent in the web app, add the generated pipeline stage, and view its findings
-and usage in the dashboard.
+Driftplain separates public benchmark exploration from authenticated CI setup. Browse exact
+source results, compare matching benchmark groups, and explicitly choose a supported model
+for your task. CI agents use your provider credentials in Jenkins; the app receives reported
+results and usage. Credentials stay in your CI environment.
 
 Built and maintained by [Steve Levit](https://github.com/Steve-droid) as a DevOps portfolio
-project. This repo is the starting point; the code lives in the four repos below.
+project. This repo is the starting point; code lives in the four repositories below.
 
-## What you can do today
+## Published implementation and rollout status — September 24, 2026
 
-| Task | How it runs | Default CI gate |
+| Surface | Published behavior | Remaining gate |
 |---|---|---|
-| PR code review | One model call with the pull-request diff and your review preferences. | High or critical findings fail the stage. |
-| Security analysis | An OpenCode agent inspects a read-only repository checkout over multiple steps. | Critical findings fail the stage. |
+| Public Explore | Anonymous benchmarks/models, source versions, exact comparisons and explanations across a 19-family registry. | Production data import and deployment; unresolved source aliases and explicit coverage gaps. |
+| CI setup | Review, security, test generation, failure diagnosis with optional fix, and Other in single-call/OpenCode modes. Explicit evidence/runtime selection and immutable revisions. | Expanded B8–B12 candidates remain pending live verification and operator activation. No eligible runtime means no selectable model. |
+| Usage/results | Reported token categories, selected-run cost estimates with complete/partial/unavailable coverage, findings, reports and proposed patches. | Reviewed exact-runtime rates must be separately inserted; missing prices are unavailable. |
+| Refresh | Bounded per-source checks, immutable acquisitions, report review and health metrics. | Schedules remain disabled/suspended and outside watched ArgoCD Applications. |
 
-The agents use your model credentials in your CI environment. Credentials stay in Jenkins;
-the hosted app receives findings and usage. Agents do not edit or push your code.
-You can sign in with a password or Google, and example projects let you explore the dashboard.
+Backend **2.0.0** and frontend **2.0.0** retire weighted recommendations and legacy create/re-pick
+actions. Existing projects, tokens, ingestion and history are preserved; re-picks use explicit
+setup. Agents remain **1.8.0**, GitOps **1.2.0**. These are published artifacts, **not deployed versions**.
+The maintained home profile still pins backend **1.0.25** and frontend **1.0.26**; chat/blob use
+fake seams. No rollout, paid call, runtime activation or scheduler enablement occurred in B17.
+
+The accepted base inputs have scores for at least three distinct source labels in 12 of 15
+families. AIME has two labels; MRCR v2 and matching RealVuln scores remain absent. Labels are
+not reviewed canonical identities: no new selectable-model coverage is inferred. TestGenEval
+and supplementary task families do not replace base gaps. Review/security's six net-new verified
+models and the new tasks' three-model/two-provider targets remain unmet.
 
 ## How it fits together
 
-1. Choose a task and model in the React app. The FastAPI backend saves the project and
-   generates a Jenkins stage with a project CI token.
-2. Jenkins starts an agent container with your provider credentials and the diff or checkout.
-   The agent reports findings, sets the stage's pass or fail result, and submits usage to the API.
-3. Open the dashboard to inspect runs, token usage, cost calculations and feedback on findings.
+1. Browse source-attributed evidence independently of CI support. A benchmark score never
+   enables a runtime. Task recommendations order only an explicitly selected comparable group.
+2. Choose an exact eligible task/model and configure inputs, permissions and Jenkins commands.
+   Review/security inspect inputs; Other, named tests and optional diagnosis repair can propose
+   bounded patches from disposable checkouts. Validation is separate from model completion.
+3. Inspect the executed revision, results, usage and estimated cost. Feedback describes rated
+   findings, not recall, equivalence or a quality guarantee. Estimates are not provider invoices.
 
-The current model ranking combines task-specific benchmark scores and token prices.
-Cost comparisons price a run's token usage at both the selected model's rates and a baseline
-model's rates. The baseline is not run, so the difference is an estimate rather than measured
-savings. The hosted chat assistant is currently offline.
+Historical baseline calculations remain compatibility data, not measured savings. There is
+no blended price/quality ranking, cheapest-model promise or automatic custom-task recommendation.
+See the component READMEs for the breaking upgrade boundary, rollout order and remaining gates.
 
 ## Repositories
 
@@ -75,10 +87,11 @@ Kubernetes resources, database names and CI credential identifiers keep their ex
 Tests use fake model responses and fixtures without paid API calls. CI agents enforce token
 limits, and the security agent also limits steps and runtime.
 
-Work is underway to add public benchmark browsing, separate it from CI setup, and replace
-the cost comparison with selected-model usage and cost. The backend already includes read-only
-catalog APIs; the browsing UI is still in development. Test generation, CI failure diagnosis
-and custom tasks are planned.
+B1–B17 implementation delivery is complete. Live model verification, reviewed aliases/rates,
+production imports/migrations and deployment remain separate operational work. Rollout requires
+backup/restore evidence, additive backend schema/API, compatible agents, frontend, then separately
+reviewed GitOps image and schedule changes. Rollback retains additive schema and immutable history;
+disable affected entry points/importers rather than downgrading or restoring over new records.
 
 For a fixed code walkthrough, the September 22, 2026 `v1.1.0` releases preserve the application
 before these changes:
